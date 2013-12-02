@@ -44,7 +44,7 @@ def check_matrix(json_str):
             for cell in cells:
                 int(cell['x'])
                 int(cell['y'])
-                float(cell['value'])
+                int(cell['value'])
         except KeyError:
             raise Exception('No key. x, y, value are expected')
         except ValueError:
