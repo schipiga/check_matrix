@@ -42,8 +42,12 @@ def check_matrix(json_str):
 
         try:
             for cell in cells:
-                int(cell['x'])
-                int(cell['y'])
+                tmp = int(cell['x'])
+                if tmp < 0:
+                    raise Exception("x can't be negative")
+                tmp = int(cell['y'])
+                if tmp < 0:
+                    raise Exception("y can't be negative")
                 int(cell['value'])
         except KeyError:
             raise Exception('No key. x, y, value are expected')
@@ -92,7 +96,7 @@ class TestCheckMatrix(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        print "Finish ;)"
+        print "\nFinish ;)"
 
     def test_sum_equiv(self):
         '''
@@ -193,6 +197,14 @@ class TestCheckMatrix(TestCase):
     def test_no_value(self):
         with self.assertRaisesRegexp(Exception, 'No key'):
             check_matrix('[{"x":0,"y":1}]')
+
+    def test_negative_x(self):
+        with self.assertRaisesRegexp(Exception, "x can't be negative"):
+            check_matrix('[{"value":0,"x":"-1","y":1}]')
+
+    def test_negative_y(self):
+        with self.assertRaisesRegexp(Exception, "y can't be negative"):
+            check_matrix('[{"value":0,"y":"-1","x":1}]')
 
     def test_invalid_json(self):
         with self.assertRaisesRegexp(Exception, 'Json is invalid'):
