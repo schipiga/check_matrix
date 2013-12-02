@@ -10,6 +10,7 @@ import json
 
 from unittest import TestCase
 
+# not used
 _json = '''
     [{"value":0,"x":1,"y":2},{"value":4,"x":3,"y":2},
     {"value":2,"x":3,"y":4},{"value":1,"x":1,"y":5},
@@ -94,24 +95,42 @@ class TestCheckMatrix(TestCase):
         print "Finish ;)"
 
     def test_sum_equiv(self):
+        '''
+        |1|
+        |1|
+        |2|
+        '''
         expect = {'x': 1, 'correct': 1}
         actual = json.loads(
-            check_matrix('[{"value":1,"x":1,"y":1},{"value":1,"x":1,"y":2}]'))
+            check_matrix(
+                '[{"value":1,"x":1,"y":1},{"value":1,"x":1,"y":2},'
+                '{"value":2,"x":1,"y":3}]'))
 
         self.assertEqual(len(actual), 1)
         self.assertEqual(expect['x'], actual[0]['x'])
         self.assertEqual(expect['correct'], actual[0]['correct'])
 
     def test_sum_not_equiv(self):
+        '''
+        |0|
+        |1|
+        |2|
+        '''
         expect = {'x': 1, 'correct': 0}
         actual = json.loads(
-            check_matrix('[{"value":0,"x":1,"y":1},{"value":1,"x":1,"y":2}]'))
+            check_matrix(
+                '[{"value":0,"x":1,"y":1},{"value":1,"x":1,"y":2},'
+                '{"value":2,"x":1,"y":3}]'))
 
         self.assertEqual(len(actual), 1)
         self.assertEqual(expect['x'], actual[0]['x'])
         self.assertEqual(expect['correct'], actual[0]['correct'])
 
     def test_last_cell_is_absent(self):
+        '''
+        |0, |
+        | ,1|
+        '''
         expect = {'x': 1, 'correct': 1}
         actual = json.loads(
             check_matrix('[{"value":0,"x":1,"y":1},{"value":1,"x":2,"y":2}]'))
@@ -121,6 +140,10 @@ class TestCheckMatrix(TestCase):
         self.assertEqual(expect['correct'], actual[0]['correct'])
 
     def test_prev_cell_is_absent(self):
+        '''
+        |0, |
+        | ,1|
+        '''
         expect = {'x': 2, 'correct': 0}
         actual = json.loads(
             check_matrix('[{"value":0,"x":1,"y":1},{"value":1,"x":2,"y":2}]'))
@@ -130,6 +153,9 @@ class TestCheckMatrix(TestCase):
         self.assertEqual(expect['correct'], actual[1]['correct'])
 
     def test_one2one_matrix(self):
+        '''
+        |1|
+        '''
         expect = {'x': 1, 'correct': 1}
         actual = json.loads(check_matrix('[{"value":0,"x":1,"y":1}]'))
 
@@ -145,20 +171,28 @@ class TestCheckMatrix(TestCase):
             check_matrix('{"value":0,"x":1,"y":1}')
 
     def test_x_isnot_numeric(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid value'):
+        with self.assertRaisesRegexp(Exception, 'Only numeric'):
             check_matrix('[{"value":0,"x":"invalid","y":1}]')
 
     def test_y_isnot_numeric(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid value'):
+        with self.assertRaisesRegexp(Exception, 'Only numeric'):
             check_matrix('[{"value":0,"x":1,"y":"invalid"}]')
 
     def test_value_isnot_numeric(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid value'):
+        with self.assertRaisesRegexp(Exception, 'Only numeric'):
             check_matrix('[{"value":"invalid","x":1,"y":1}]')
 
-    def test_no_key(self):
+    def test_no_x(self):
         with self.assertRaisesRegexp(Exception, 'No key'):
             check_matrix('[{"value":0,"y":1}]')
+
+    def test_no_y(self):
+        with self.assertRaisesRegexp(Exception, 'No key'):
+            check_matrix('[{"value":0,"x":1}]')
+
+    def test_no_value(self):
+        with self.assertRaisesRegexp(Exception, 'No key'):
+            check_matrix('[{"x":0,"y":1}]')
 
     def test_invalid_json(self):
         with self.assertRaisesRegexp(Exception, 'Json is invalid'):
